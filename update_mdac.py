@@ -1,13 +1,12 @@
 import os
 import sys
 import requests
-
+import hashlib  # ✅ move here
 
 def update_confluence(page_id, modules):
     confluence_url = os.environ["CONFLUENCE_URL"]
     pat = os.environ["CONFLUENCE_PAT"]
 
-    import hashlib
     print("🔐 Token hash:", hashlib.sha256(pat.encode()).hexdigest())
 
     headers = {
