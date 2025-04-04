@@ -12,10 +12,10 @@ spec:
   steps:
     - name: run-python
       image: python:3.9
-      workingDir: /workspace/output
       script: |
         #!/bin/sh
         pip install requests
+        echo "📥 Downloading script..."
         curl -O https://raw.githubusercontent.com/NawalC/update-confluence-pipeline-/main/update_mdac.py
         python update_mdac.py $(params.page-id) $(params.module-namespace)
       env:
@@ -24,9 +24,8 @@ spec:
             secretKeyRef:
               name: confluence-creds
               key: url
-        - name: JSESSIONID
+        - name: CONFLUENCE_PAT
           valueFrom:
             secretKeyRef:
-              name: confluence-session-cookie
-              key: JSESSIONID
-
+              name: confluence-creds
+              key: pat
