@@ -16,6 +16,11 @@ spec:
           name: update-confluence-task
         params:
           - name: page-id
-            value: "411561521"
+            value: "$(params.page-id)"
           - name: module-namespace
-            value: "test-ns"
+            value: "$(params.module-namespace)"
+  params:
+    - name: page-id
+      value: "xxxxxxxx"
+    - name: module-namespace
+      value: "test-ns"
