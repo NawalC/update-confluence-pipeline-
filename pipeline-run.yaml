@@ -21,6 +21,6 @@ spec:
             value: "$(params.module-namespace)"
   params:
     - name: page-id
-      value: "229408"
+      value: "229377" 
     - name: module-namespace
       value: "test-ns"

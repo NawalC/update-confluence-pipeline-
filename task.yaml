@@ -24,8 +24,23 @@ spec:
             secretKeyRef:
               name: confluence-creds
               key: url
+        - name: CONFLUENCE_USER
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: user
         - name: CONFLUENCE_PAT
           valueFrom:
             secretKeyRef:
               name: confluence-creds
               key: pat
+
+
+
+
+
+
+
+
+
+

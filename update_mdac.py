@@ -1,21 +1,25 @@
 import os
 import sys
 import requests
-import hashlib  # ✅ move here
+import base64
+import hashlib
 
 def update_confluence(page_id, modules):
     confluence_url = os.environ["CONFLUENCE_URL"]
+    username = os.environ["CONFLUENCE_USER"]
     pat = os.environ["CONFLUENCE_PAT"]
 
     print("🔐 Token hash:", hashlib.sha256(pat.encode()).hexdigest())
 
+    credentials = f"{username}:{pat}"
+    token = base64.b64encode(credentials.encode()).decode()
+
     headers = {
-        "Authorization": f"Bearer {pat}",
+        "Authorization": f"Basic {token}",
         "Content-Type": "application/json"
     }
 
     url = f"{confluence_url}/rest/api/content/{page_id}?expand=body.storage,version"
-
     print("📡 Requesting page info from:", url)
     response = requests.get(url, headers=headers)
     print("🔎 Status Code:", response.status_code)
@@ -67,7 +71,6 @@ def main():
         {"name": f"module-{namespace}", "version": "1.0.0", "type": "operator"},
         {"name": f"ui-{namespace}", "version": "2.0.1", "type": "frontend"}
     ]
-
     update_confluence(page_id, modules)
 
 if __name__ == "__main__":
