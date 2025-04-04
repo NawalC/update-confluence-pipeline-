@@ -24,13 +24,9 @@ spec:
             secretKeyRef:
               name: confluence-creds
               key: url
-        - name: CONFLUENCE_USER
+        - name: JSESSIONID
           valueFrom:
             secretKeyRef:
-              name: confluence-creds
-              key: username
-        - name: CONFLUENCE_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: confluence-creds
-              key: token
+              name: confluence-session-cookie
+              key: JSESSIONID
+
