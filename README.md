@@ -116,4 +116,4 @@ https://nwalcareem.atlassian.net/wiki/spaces/MFS/pages/229377/Tekton+Test+Page
 ### 13. Screenshot of Successful Pipeline Run
 Below is an example screenshot of a successful pipeline run in the Tekton Dashboard:
 
-![Successful Pipeline Run](./images/successful-pipeline-run.png)
+![Successful Pipeline Run](./image.png)
