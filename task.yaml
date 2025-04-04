@@ -16,7 +16,7 @@ spec:
       script: |
         #!/bin/sh
         pip install requests
-        curl -O https://raw.githubusercontent.com/YOUR_GITHUB_USER/YOUR_REPO/main/update_confluence_modules.py
+        curl -O https://raw.githubusercontent.com/NawalC/update-confluence-pipeline-/main/update_mdac.py
         python update_confluence_modules.py $(params.page-id) $(params.module-namespace)
       env:
         - name: CONFLUENCE_URL

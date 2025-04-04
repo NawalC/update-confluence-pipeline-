@@ -41,9 +41,9 @@ def update_confluence(page_id, modules):
     update_response = requests.put(update_url, headers=headers, auth=auth, json=payload)
 
     if update_response.status_code == 200:
-        print("✅ Page updated successfully.")
+        print("Page updated successfully.")
     else:
-        print("❌ Failed to update:", update_response.text)
+        print("Failed to update:", update_response.text)
 
 def main():
     page_id = sys.argv[1]
