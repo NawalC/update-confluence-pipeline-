@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: update-confluence-task
+  namespace: default
+spec:
+  params:
+    - name: page-id
+      type: string
+    - name: module-namespace
+      type: string
+  steps:
+    - name: run-python
+      image: python:3.9
+      workingDir: /workspace/output
+      script: |
+        #!/bin/sh
+        pip install requests
+        curl -O https://raw.githubusercontent.com/YOUR_GITHUB_USER/YOUR_REPO/main/update_confluence_modules.py
+        python update_confluence_modules.py $(params.page-id) $(params.module-namespace)
+      env:
+        - name: CONFLUENCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: url
+        - name: CONFLUENCE_USER
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: username
+        - name: CONFLUENCE_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: token

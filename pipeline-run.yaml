@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: update-confluence-run
+  namespace: default
+spec:
+  pipelineSpec:
+    params:
+      - name: page-id
+        type: string
+      - name: module-namespace
+        type: string
+    tasks:
+      - name: update-page
+        taskRef:
+          name: update-confluence-task
+        params:
+          - name: page-id
+            value: "123456789"  # 🔁 Replace with your actual Confluence page ID
+          - name: module-namespace
+            value: "test-ns"
