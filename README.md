@@ -1,87 +1,119 @@
 # update-confluence-pipeline-
+## Pipeline Setup and Execution
 
-![alt text](image.png)
-https://nwalcareem.atlassian.net/wiki/spaces/MFS/pages/229377/Tekton+Test+Page
+### 1. Start a Local Kubernetes Cluster
+Use Minikube to start a local Kubernetes cluster:
+```sh
+minikube start
+```
+To verify it worked, run:
+```sh
+kubectl cluster-info
+```
+You should see information about the Minikube cluster.
 
-## Purpose
-
-The purpose of this project is to automate the process of updating Confluence pages with data from various sources. This helps in maintaining up-to-date documentation and streamlining the workflow for teams using Confluence.
-
-## Journey
-
-The journey of this project began with the need to ensure that our Confluence pages reflect the latest information without manual intervention. The project leverages Python scripts to fetch data, process it, and update specific Confluence pages. Over time, the pipeline has been enhanced to handle various data sources and formats, improving its robustness and flexibility.
-
-## Setup and Execution
-
-Follow these steps to set up and execute the pipeline:
-
-1. **Start Minikube**
-   ```sh
-   minikube start
-
-   
-This command starts a local Kubernetes cluster using Minikube.
-
-Use Minikube context
-
-sh
+### 2. Set Minikube Context
+Set the current Kubernetes context to Minikube:
+```sh
 kubectl config use-context minikube
-This command sets the current context to Minikube.
+```
+To confirm, check the current context:
+```sh
+kubectl config current-context
+```
+It should return `minikube`.
 
-Install Tekton Pipelines
-
-sh
+### 3. Install Tekton Pipelines
+Install the latest Tekton Pipelines on the Kubernetes cluster:
+```sh
 kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
-This command installs the latest Tekton Pipelines on the Kubernetes cluster.
+```
+To verify, check the Tekton Pipelines pods:
+```sh
+kubectl get pods -n tekton-pipelines
+```
+You should see pods with names starting with `tekton`.
 
-Apply the task configuration
-
-sh
+### 4. Apply Task Configuration
+Apply the `task.yaml` configuration in the default namespace:
+```sh
 kubectl apply -f task.yaml -n default
-This command applies the task.yaml configuration in the default namespace.
+```
+To confirm, list the tasks:
+```sh
+kubectl get tasks -n default
+```
+You should see your task listed.
 
-Apply the pipeline run configuration
-
-sh
+### 5. Apply Pipeline Run Configuration
+Apply the `pipeline-run.yaml` configuration in the default namespace:
+```sh
 kubectl apply -f pipeline-run.yaml -n default
-This command applies the pipeline-run.yaml configuration in the default namespace.
+```
+To verify, list the pipeline runs:
+```sh
+kubectl get pipelineruns -n default
+```
+You should see your pipeline run listed.
 
-Get the status of the task runs
-
-sh
+### 6. Monitor Task Run Status
+Retrieve the status of the task runs in the default namespace:
+```sh
 kubectl get taskruns -n default
-This command retrieves the status of the task runs in the default namespace.
+```
+Ensure the status column shows `Succeeded` or `Running`.
 
-View logs of the task run
-
-sh
+### 7. View Task Run Logs
+Retrieve the logs of the task run named `update-confluence-run-update-page`:
+```sh
 kubectl logs -n default update-confluence-run-update-page --all-containers
-This command retrieves the logs of the task run named update-confluence-run-update-page in the default namespace.
+```
+Check the logs for any errors or successful execution messages.
 
-Describe the task run
-
-sh
+### 8. Describe the Task Run
+Get detailed information about the task run:
+```sh
 kubectl describe taskrun update-confluence-run-update-page -n default
-This command provides detailed information about the task run named update-confluence-run-update-page in the default namespace.
+```
+Look for the `Conditions` section to confirm the task run status.
 
-Get the status of the pods
-
-sh
+### 9. Check Pod Status
+Retrieve the status of the pods in the default namespace:
+```sh
 kubectl get pods -n default
-This command retrieves the status of the pods in the default namespace.
+```
+Ensure the pods related to your pipeline are in the `Running` or `Completed` state.
 
-View logs of a specific pod step
-
-sh
+### 10. View Logs of a Specific Pod Step
+Retrieve the logs of the specific step `step-run-python` in the pod:
+```sh
 kubectl logs -n default update-confluence-run-update-page-pod -c step-run-python
-This command retrieves the logs of the specific step step-run-python in the pod update-confluence-run-update-page-pod in the default namespace.
+```
+Check the logs for any errors or successful execution messages.
 
-Create a secret for Confluence credentials
-
-sh
+### 11. Create a Secret for Confluence Credentials
+Create a secret named `confluence-creds` with the Confluence URL, username, and personal access token:
+```sh
 kubectl create secret generic confluence-creds \
-  --from-literal=url=https://nwalcareem.atlassian.net/wiki \
-  --from-literal=user=nwal.careem@gmail.com \
-  --from-literal=pat=<your-api-token> \
-  -n default
-This command creates a secret named confluence-creds with the Confluence URL, user, and personal access token (PAT) in the default namespace.
+    --from-literal=url=https://nwalcareem.atlassian.net/wiki \
+    --from-literal=user=nwal.careem@gmail.com \
+    --from-literal=pat=<your-api-token> \
+    -n default
+```
+To verify, list the secrets:
+```sh
+kubectl get secrets -n default
+```
+You should see `confluence-creds` in the list.
+
+
+### 12. Access the Confluence Page
+Once the pipeline completes successfully, navigate to the Confluence page to verify the updates. Use the following URL:
+```
+https://nwalcareem.atlassian.net/wiki/spaces/MFS/pages/229377/Tekton+Test+Page
+```
+
+### 13. Screenshot of Successful Pipeline Run
+Below is an example screenshot of a successful pipeline run in the Tekton Dashboard:
+
+![Successful Pipeline Run](./images/successful-pipeline-run.png)
