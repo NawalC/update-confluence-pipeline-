@@ -1,4 +1,4 @@
-# update-confluence-pipeline-
+# update-confluence-pipeline
 ## Pipeline Setup and Execution
 
 ### 1. Start a Local Kubernetes Cluster
