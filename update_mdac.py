@@ -5,22 +5,23 @@ import json
 
 def update_confluence(page_id, modules):
     confluence_url = os.environ["CONFLUENCE_URL"]
-    username = os.environ["CONFLUENCE_USER"]
-    token = os.environ["CONFLUENCE_TOKEN"]
+    pat = os.environ["CONFLUENCE_PAT"]
 
-    headers = {"Content-Type": "application/json"}
-    auth = (username, token)
+    headers = {
+        "Authorization": f"Bearer {pat}",
+        "Content-Type": "application/json"
+    }
 
     url = f"{confluence_url}/rest/api/content/{page_id}?expand=body.storage,version"
 
     print("📡 Requesting page info from:", url)
-    response = requests.get(url, auth=auth)
+    response = requests.get(url, headers=headers)
 
     print("🔎 Status Code:", response.status_code)
     print("📄 Response Preview (first 200 chars):", response.text[:200])
 
     if response.status_code != 200:
-        print("❌ Failed to get page info — check page ID, auth, or URL")
+        print("❌ Failed to get page info — check page ID, token, or URL")
         return
 
     try:
@@ -49,7 +50,7 @@ def update_confluence(page_id, modules):
     }
 
     update_url = f"{confluence_url}/rest/api/content/{page_id}"
-    update_response = requests.put(update_url, headers=headers, auth=auth, json=payload)
+    update_response = requests.put(update_url, headers=headers, json=payload)
 
     if update_response.status_code == 200:
         print("✅ Page updated successfully.")
