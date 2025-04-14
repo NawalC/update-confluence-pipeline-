@@ -1,0 +1,37 @@
+steps:
+  - name: publish
+    image: python:3.9
+    script: |
+      #!/bin/bash
+      set -e
+      echo "📦 Installing dependencies..."
+      pip install requests --quiet
+
+      echo "🚀 Running Python script..."
+      python3 /workspace/source/create_page.py
+    env:
+      - name: CONFLUENCE_USER
+        valueFrom:
+          secretKeyRef:
+            name: confluence-creds
+            key: user
+      - name: CONFLUENCE_PAT
+        valueFrom:
+          secretKeyRef:
+            name: confluence-creds
+            key: pat
+      - name: CONFLUENCE_URL
+        valueFrom:
+          secretKeyRef:
+            name: confluence-creds
+            key: url
+      - name: SPACE_KEY
+        value: "$(params.space-key)"
+      - name: PARENT_ID
+        value: "$(params.parent-page-id)"
+      - name: MODULE_NAME
+        value: "$(params.module-name)"
+      - name: PREVIOUS_VERSION
+        value: "$(params.previous-version)"
+      - name: NEW_VERSION
+        value: "$(params.new-version)"
