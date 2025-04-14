@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: dummy-release-pipeline
+  namespace: default
+spec:
+  params:
+    - name: module-name
+    - name: previous-version
+    - name: new-version
+    - name: parent-page-id
+    - name: space-key
+
+  tasks:
+    - name: publish-to-confluence
+      taskRef:
+        name: create-confluence-page
+      params:
+        - name: module-name
+          value: "$(params.module-name)"
+        - name: previous-version
+          value: "$(params.previous-version)"
+        - name: new-version
+          value: "$(params.new-version)"
+        - name: parent-page-id
+          value: "$(params.parent-page-id)"
+        - name: space-key
+          value: "$(params.space-key)"

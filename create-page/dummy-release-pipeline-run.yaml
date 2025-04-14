@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: dummy-release-pipeline-run
+  namespace: default
+spec:
+  pipelineRef:
+    name: dummy-release-pipeline
+  params:
+    - name: module-name
+      value: dummy-app
+    - name: previous-version
+      value: 0.9.9
+    - name: new-version
+      value: 1.0.0
+    - name: parent-page-id
+      value: "229408"  
+    - name: space-key
+      value: "~5f146957e5efc1001bcfedf7"
