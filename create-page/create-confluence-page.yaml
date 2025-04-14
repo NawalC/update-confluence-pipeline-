@@ -1,0 +1,106 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: create-confluence-page
+  namespace: default
+spec:
+  params:
+    - name: parent-page-id
+      type: string
+    - name: space-key
+      type: string
+    - name: module-name
+      type: string
+    - name: previous-version
+      type: string
+    - name: new-version
+      type: string
+  steps:
+    - name: publish
+      image: python:3.9
+      script: |
+        #!/bin/bash
+        set -e
+        echo "🔧 Installing Python requests module..."
+        pip install requests --quiet
+
+        echo "📄 Running page creation script..."
+        python3 <<EOF
+        import os
+        import requests
+        import base64
+        import json
+
+        parent_id = "${PARENT_ID}"
+        space = "${SPACE_KEY}"
+        module = "${MODULE_NAME}"
+        prev = "${PREVIOUS_VERSION}"
+        new = "${NEW_VERSION}"
+        title = f"Release - {module} {new}"
+
+        user = os.getenv("CONFLUENCE_USER")
+        pat = os.getenv("CONFLUENCE_PAT")
+        base = os.getenv("CONFLUENCE_URL")
+
+        table_html = f'''
+        <table>
+          <tr><th>Module</th><th>Previous Version</th><th>New Version</th></tr>
+          <tr><td>{module}</td><td>{prev}</td><td>{new}</td></tr>
+        </table>
+        '''
+
+        payload = {
+          "type": "page",
+          "title": title,
+          "ancestors": [{"id": parent_id}],
+          "space": {"key": space},
+          "body": {
+            "storage": {
+              "value": table_html,
+              "representation": "storage"
+            }
+          }
+        }
+
+        auth = f"{user}:{pat}"
+        encoded = base64.b64encode(auth.encode()).decode()
+        headers = {
+          "Authorization": f"Basic {encoded}",
+          "Content-Type": "application/json"
+        }
+
+        print(f"📤 Creating page under parent {parent_id} with title '{title}'")
+        r = requests.post(f"{base}/rest/api/content", headers=headers, json=payload)
+
+        if r.status_code in [200, 201]:
+          print("✅ Confluence page created successfully.")
+        else:
+          print(f"❌ Failed with status {r.status_code}")
+          print(r.text)
+        EOF
+      env:
+        - name: CONFLUENCE_USER
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: user
+        - name: CONFLUENCE_PAT
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: pat
+        - name: CONFLUENCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: url
+        - name: PARENT_ID
+          value: "$(params.parent-page-id)"
+        - name: SPACE_KEY
+          value: "$(params.space-key)"
+        - name: MODULE_NAME
+          value: "$(params.module-name)"
+        - name: PREVIOUS_VERSION
+          value: "$(params.previous-version)"
+        - name: NEW_VERSION
+          value: "$(params.new-version)"

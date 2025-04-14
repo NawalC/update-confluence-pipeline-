@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: hello-world-pipeline-run
+  namespace: default
+spec:
+  pipelineRef:
+    name: hello-world-pipeline             
+  params:
+    - name: parent-page-id
+      value: "229408"  
+    - name: space-key
+      value: "~5f146957e5efc1001bcfedf7"                       

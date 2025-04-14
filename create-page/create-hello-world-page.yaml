@@ -1,0 +1,83 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: create-hello-world-page
+  namespace: default
+spec:
+  params:
+    - name: parent-page-id
+      type: string
+    - name: space-key
+      type: string
+  steps:
+    - name: create-page
+      image: python:3.9
+      script: |
+        #!/bin/bash
+        pip install requests --quiet
+
+        python3 <<EOF
+        import os
+        import base64
+        import requests
+        import json
+
+        title = "Hello World Page"
+        content = "<p>Hello, world!</p>"
+
+        parent_id = "${PARENT_ID}"
+        space_key = "${SPACE_KEY}"
+
+        user = os.getenv("CONFLUENCE_USER")
+        pat = os.getenv("CONFLUENCE_PAT")
+        url = os.getenv("CONFLUENCE_URL")
+
+        payload = {
+            "type": "page",
+            "title": title,
+            "ancestors": [{"id": parent_id}],
+            "space": {"key": space_key},
+            "body": {
+                "storage": {
+                    "value": content,
+                    "representation": "storage"
+                }
+            }
+        }
+
+        auth = f"{user}:{pat}"
+        encoded = base64.b64encode(auth.encode()).decode()
+        headers = {
+            "Authorization": f"Basic {encoded}",
+            "Content-Type": "application/json"
+        }
+
+        print(f"Creating page: {title}")
+        r = requests.post(f"{url}/rest/api/content", headers=headers, json=payload)
+
+        if r.status_code in [200, 201]:
+            print("Page created successfully.")
+        else:
+            print("Failed:", r.status_code)
+            print(r.text)
+        EOF
+      env:
+        - name: CONFLUENCE_USER
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: user
+        - name: CONFLUENCE_PAT
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: pat
+        - name: CONFLUENCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: confluence-creds
+              key: url
+        - name: PARENT_ID
+          value: "$(params.parent-page-id)"
+        - name: SPACE_KEY
+          value: "$(params.space-key)"
