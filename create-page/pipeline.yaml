@@ -18,3 +18,18 @@ spec:
           value: "$(params.parent-page-id)"
         - name: space-key
           value: "$(params.space-key)"
+
+
+
+# /* 
+# kubectl apply -f create-hello-world-page.yaml
+# kubectl apply -f pipeline.yaml
+# kubectl apply -f pipeline-run.yaml
+# kubectl get pods -A
+# kubectl logs -f hello-world-pipeline-run-publish-pod -c step-publish
+# kubectl get pod hello-world-pipeline-run-publish-pod -o jsonpath="{.spec.containers[*].name}"
+# kubectl logs -f hello-world-pipeline-run-publish-pod -c step-create-page
+# kubectl logs hello-world-pipeline-run-publish-pod --all-containers
+# kubectl delete pipelinerun pipeline-run
+# kubectl get pipelinerun
+# kubectl delete pipelinerun hello-world-pipeline-run */
